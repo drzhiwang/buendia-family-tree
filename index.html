@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f6f4ee">
+  <meta name="description" content="探索《百年孤独》中布恩迪亚家族的七代传承、人物关系与事件时间线。">
+  <title>百年孤独 · 布恩迪亚家族图谱</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500&amp;family=Noto+Serif+SC:wght@500&amp;display=swap">
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="data.js"></script>
+  <script defer src="graph-layout.js"></script>
+  <script defer src="events.js"></script>
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <header class="masthead">
+    <h1 id="page-title">百年孤独<span class="title-divider"></span><span class="title-sub">人物图谱</span></h1>
+    <div class="header-end"><span class="spoiler"><span></span>含全书剧透</span><button class="text-button" id="about-button">帮助与来源</button></div>
+  </header>
+  <main aria-labelledby="page-title">
+    <section class="workspace" aria-label="交互人物关系图">
+      <div class="toolbar">
+        <div class="search-wrap"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><input id="search" type="search" placeholder="搜索人物" aria-label="搜索人物姓名、别名或西文名" aria-controls="search-results" autocomplete="off"><kbd aria-hidden="true">/</kbd><div id="search-results" class="search-results" hidden></div></div>
+        <div class="filters" role="group" aria-label="显示的关系类型"><span class="filter-label">关系</span><button data-filter="parentage" aria-pressed="true"><i class="line-sample blood"></i>亲子</button><button data-filter="marriage" aria-pressed="true"><i class="line-sample marriage"></i>婚姻</button><button data-filter="partner" aria-pressed="true"><i class="line-sample partner"></i>伴侣</button></div>
+        <div class="toolbar-actions">
+          <button id="reading-view" title="恢复 80% 阅读比例">阅读比例</button>
+          <button class="overview-button" id="overview"><span aria-hidden="true">⤢</span> 全图</button>
+          <button id="toggle-sidebar" aria-controls="detail-panel" aria-expanded="true">收起侧栏</button>
+        </div>
+      </div>
+      <div class="workarea">
+        <nav class="generation-nav" aria-label="按世代定位"><span class="rail-title">世代</span></nav>
+        <div class="chart-wrap">
+          <div class="canvas-caption" id="selection-caption" hidden><span id="canvas-caption"></span><button id="clear-selection" aria-label="取消当前选择">×</button></div>
+          <svg id="chart" xmlns="http://www.w3.org/2000/svg" aria-label="布恩迪亚家族七代人物关系图；用 Tab 选择人物，方向键平移画布" tabindex="0"><defs><pattern id="dots" width="28" height="28" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="0.7" fill="#d8d3c8"/></pattern></defs><rect width="100%" height="100%" fill="url(#dots)" aria-hidden="true"/><g id="world"><g id="generation-guides" aria-hidden="true"></g><g id="connections" aria-hidden="true"></g><g id="people"></g></g></svg>
+          <div class="zoom-controls" aria-label="图谱缩放"><button id="zoom-out" aria-label="缩小">−</button><output id="zoom-value" aria-live="off">80%</output><button id="zoom-in" aria-label="放大">+</button><span></span><button id="reset-view" aria-label="重置视图" title="重置视图">↺</button></div>
+        </div>
+        <aside class="detail-panel" id="detail-panel" aria-label="时间线与人物详情">
+          <div class="panel-header">
+            <div class="panel-tabs" role="tablist" aria-label="浏览内容">
+              <button id="timeline-tab" role="tab" aria-selected="true" aria-controls="timeline-pane">时间线</button>
+              <button id="person-tab" role="tab" aria-selected="false" aria-controls="person-pane" tabindex="-1" disabled>人物详情</button>
+            </div>
+            <button id="close-panel" aria-label="收起侧栏">×</button>
+          </div>
+          <section id="timeline-pane" role="tabpanel" aria-labelledby="timeline-tab">
+            <div class="timeline-toolbar"><span id="timeline-count"></span><button id="clear-timeline-filter" hidden>全部事件</button></div>
+            <div id="timeline-filter" hidden></div>
+            <div id="timeline-content" class="panel-scroll"></div>
+          </section>
+          <section id="person-pane" role="tabpanel" aria-labelledby="person-tab" hidden><div id="detail-content" class="panel-scroll"></div></section>
+        </aside>
+      </div>
+    </section>
+  </main>
+  <p id="announcement" class="sr-only" role="status" aria-live="polite"></p>
+  <dialog id="about-dialog" aria-labelledby="about-title">
+    <button class="close-button" id="close-about" aria-label="关闭帮助">×</button>
+    <h2 id="about-title">帮助与来源</h2>
+    <h3>图谱与时间线</h3>
+    <p>点击事件可定位所有相关人物；点击人物可查看其详情与相关事件。时间线按小说故事先后整理，序号不表示年份；持续性事件按主要转折排列。图谱保留全书关系，不表示这些关系在所选事件发生时已经形成。</p>
+    <p>家族树纵向表示世代。虚线边框为家族关联人物，蕾贝卡按收养关系置于第二代。“亲子”同时控制亲生和收养连线，统一使用实线；收养身份通过“养女”等文字说明。表亲、姨甥和姑侄等额外亲属连线在选中相关人物或事件时标出名称。两个人物之间可能同时存在多种关系。支线汇合处以圆点标记，交叉线以留白区分。</p>
+    <div class="legend-list"><span><i class="line-sample blood"></i>亲子</span><span><i class="line-sample marriage"></i>婚姻</span><span><i class="line-sample partner"></i>伴侣</span><span><i class="line-sample social"></i>其他联系</span></div>
+    <h3>操作</h3>
+    <p>拖动画布平移，滚轮缩放。左侧数字以阅读比例定位世代。“阅读比例”恢复 80% 清晰视图，“全图”显示完整家族树；“↺”清除所有选择和筛选。</p>
+    <p>按 / 搜索，Tab 选择控件，Enter 或空格确认；画布中可用方向键平移、＋ / − 缩放。Esc 取消当前选择。侧栏可通过工具栏按钮收起或展开。点击事件会自动缩放以展示全部相关人物，随后可用“阅读比例”放大回来。</p>
+    <h3>作品与译名</h3>
+    <p>内容依据加西亚·马尔克斯《百年孤独》（1967），包含全书剧透。简介与事件摘要为原创概述。中文采用常见译名，并保留西文名供对照；搜索兼容部分常见译名差异。</p>
+    <ul>
+      <li><a href="https://es.wikipedia.org/wiki/Cien_a%C3%B1os_de_soledad" target="_blank" rel="noreferrer">西班牙语维基百科 · 人物资料 ↗</a></li>
+      <li><a href="https://en.wikipedia.org/wiki/One_Hundred_Years_of_Solitude" target="_blank" rel="noreferrer">英语维基百科 · 人物资料 ↗</a></li>
+      <li><a href="https://www.sparknotes.com/lit/solitude/" target="_blank" rel="noreferrer">SparkNotes · 小说分章梳理 ↗</a></li>
+    </ul>
+    <h3>人物头像</h3>
+    <p><span id="portrait-count">27</span> 位人物采用 Netflix 剧照，其余使用剪影。图片时期、可确认的演员及来源见人物详情。头像只是剧集形象参考，人物关系与时间线依据小说。所有头像保存在本地，可离线显示。</p>
+  </dialog>
+</body>
+</html>
